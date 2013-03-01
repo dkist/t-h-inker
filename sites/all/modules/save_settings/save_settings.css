@@ -1,0 +1,77 @@
+.checkbox_label {
+float: right;
+}
+
+
+.save_settings_button {
+/*position:absolute;*/
+left:40%;
+/*margin-bottom: 20px !important;*/
+}
+
+.save_settings_form_information{
+	overflow-y: auto;
+	max-height: 400px;
+	background-color: white;
+}
+.save_settings_form{
+margin-left:auto;
+margin-right:auto;
+/*overflow-y: auto;
+max-height: 400px;*/
+background-color: white;
+text-transform: none !important;
+/*width: 35%;*/
+}
+
+.notification_listing_class{
+list-style-type: circle;
+color: darkGray;
+font-size: small;
+}
+
+#notifcations-listing{
+list-style-type: circle;
+color: darkGray;
+font-size: small;
+
+}
+
+#notifcations-listing li{
+padding-bottom: 4px;
+border-bottom: 1px dotted #d1d1d1; 
+
+
+}
+
+
+.notification_title_listing_class li{
+padding-bottom: 4px;
+border-bottom: 1px dotted #d1d1d1; 
+}
+
+.notification_title_listing_class{
+list-style-type: none;
+color: darkGray;
+font-size: small;
+}
+
+#notifcations-title-listing{
+list-style-type: none;
+color: darkGray;
+font-size: small;
+
+}
+
+.save_settings_form legend{
+	text-transform: none !important;
+}
+
+.save_settings_form fieldset.collapsed {
+	height: 4em !important;	
+	overflow-x: none !important;
+}
+
+.save_settings_form fieldset.collapsible {
+	overflow-x: none !important;
+}

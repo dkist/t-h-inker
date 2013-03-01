@@ -1,0 +1,9 @@
+name = Node access node reference
+description = Provides per node access control with Node reference fields.
+core = 7.x
+; Information added by drupal.org packaging script on 2012-05-24
+version = "7.x-1.21"
+core = "7.x"
+project = "nodeaccess_nodereference"
+datestamp = "1337903167"
+

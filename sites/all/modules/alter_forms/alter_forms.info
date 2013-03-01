@@ -1,0 +1,5 @@
+name = Alter Forms
+description = Allows altering the forms.
+core = 7.x
+package = Alter Forms
+stylesheets[all][] = alter_forms.css

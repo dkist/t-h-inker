@@ -1,0 +1,71 @@
+<?php 
+
+
+/* function alter_forms_schema() {
+         $schema['alter_forum_form'] = array(
+         'description' => t('The base table for saved articles.'),
+         'fields' => array(
+         'tid' => array(
+         'description' => t('The primary identifier'),
+         'type' => 'int',
+         'unsigned' => TRUE,
+         'not null' => TRUE),
+         'uid' => array(
+         'description' => t('The user identifier.'),
+         'type' => 'int',
+         'unsigned' => TRUE,
+         'not null' => TRUE,
+         'default' => 0),
+         'publish' => array(
+         'description' => t('The name.'),
+         'type' => 'int',
+         'unsigned' => TRUE,
+         'not null' => TRUE),
+         ),
+         'primary key' => array('tid'),
+          'foreign keys' => array(
+          'taxonomy_term_data' => array(
+          'table' => 'taxonomy_term_data',
+          'columns' => array('tid' => 'tid'),
+       ),
+     ), 
+         );
+/*
+ $schema['alter_forms_Membership'] = array(
+ 'description' => t('The base table for saved articles.'),
+ 'fields' => array(
+ 'id' => array(
+ 'description' => t('The primary identifier'),
+ 'type' => 'int',
+ 'unsigned' => TRUE,
+ 'not null' => TRUE),
+ 'uid1' => array(
+ 'description' => t('The user identifier.'),
+ 'type' => 'int',
+ 'unsigned' => TRUE,
+ 'not null' => TRUE,
+ 'default' => 0),
+ 'name' => array(
+ 'description' => t('The name.'),
+ 'type' => 'varchar',
+ 'length' => '100',
+ 'not null' => TRUE,
+ 'not null' => TRUE),
+ ),
+ 'primary key' => array('id'),
+ );
+
+ return $schema;
+}
+*/
+/*function alter_forms_install() {
+ // Create my tables.
+ drupal_install_schema('alter_forms');
+}
+
+function alter_forms_uninstall() {
+ // Drop my tables.
+ 
+ drupal_uninstall_schema('alter_forms');
+}*/
+?>

@@ -1,0 +1,17 @@
+div.shift{
+    margin-left: 30px;
+	
+}
+
+.form-item-feedback-type{
+display: inline;
+
+}
+
+.feedback_message_floater{
+float: right;
+}
+
+.fieldset-wrapper{
+margin-top: 15px;
+}

@@ -1,0 +1,5 @@
+name = Convert Content Type
+description = "Tries Converting the content types"
+core = 7.x
+dependencies[] = ctools
+package = Convert ContentType

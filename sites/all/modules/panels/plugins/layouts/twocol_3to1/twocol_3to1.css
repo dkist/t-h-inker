@@ -1,0 +1,41 @@
+
+.panel-2col-stacked { 
+/*  overflow: hidden;  */
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.panel-twocol-3to1.panel-col-top,
+.panel-twocol-3to1 .panel-col-bottom { 
+  width: 99.9%; 
+  clear: both;
+}
+
+.panel-twocol-3to1.panel-col-top .inside {
+  margin-bottom: .5em;
+}
+
+.panel-twocol-3to1 .panel-col-first { 
+  float: left; 
+  width: 80%; 
+}
+* html .panel-twocol-3to1 .panel-col-first {
+  width: 79.9%;
+}
+
+.panel-twocol-3to1 .panel-col-first .inside { 
+  margin: 0 .5em 1em 0;
+}
+
+.panel-twocol-3to1 .panel-col-last { 
+  float: right; 
+  width: 19.9%; 
+}
+
+.panel-twocol-3to1 .panel-col-last .inside { 
+  margin: 0 0 1em .5em;
+}
+
+.panel-twocol-3to1 .panel-separator {
+  margin: 0 0 1em 0;
+}

@@ -1,0 +1,1126 @@
+<?php
+
+
+//include(drupal_get_path('module', 'profile2').'/profile2.module');
+function alter_forms_form_alter(&$form, &$form_state, &$form_id){
+  //	drupal_set_message('The form ID is ' . $form_id);
+//drupal_set_message('<pre>'. print_r($node, TRUE) .'</pre>');  
+        
+   	 	if ($form_id == "poll_node_form"){        
+		      $form["field_poll_forum"]["und"]['#default_value'] = arg(3); 
+                    //$form["field_poll_forum"]["und"]["#attributes"]["disabled"] = TRUE;
+                    hide($form["field_poll_forum"]);
+	}
+
+	
+	elseif ($form_id == "user_register_form"){
+	  $form['#submit'][] = 'user_registered_submit_handler';
+	
+	}
+	
+	
+	
+       elseif ($form_id == "user_login_block")
+	{
+	
+       /* $form['name']['#weight'] = -3;
+		$form['name']['#required'] = false;
+ 		$form['pass']['#weight'] = -2; 
+		$form['pass']['#required'] = false;
+ 		$form['actions']['#weight'] = -1; 
+        $form['actions']['#attributes']['class'][] = 'shift';*/
+	
+	hide($form['name']); hide($form['pass']); hide($form['actions']); hide($form['links']);
+	
+	 $form['stupid_ajax_link'] = array(
+    '#type' => 'checkbox',
+	'#title' => t('LOGIN or SIGNUP'),
+	'#ajax' => array(
+    'callback' => 'hover_over_text',
+    'wrapper' => 'put_me_here'),
+    '#prefix' => '<div id="put_me_here">',
+    '#suffix' => '</div>',    
+  );
+
+        }
+
+  	elseif ($form_id == "forum_node_form"){
+		$form["field_forum_forum"]["und"]['#default_value'] = arg(3);
+ 		hide($form['field_forum_forum']);
+
+
+	}
+
+	elseif ($form_id == "page_node_form"){
+    		$form["field_page_forum"]["und"]['#default_value'] = arg(3);
+     		hide($form['field_page_forum']);
+
+	}
+
+      elseif ($form_id == "newsitem_node_form"){
+		 hide($form['field_default_newstag']);
+	}
+
+       elseif ($form_id == "profile2_edit_main_form"){
+       
+        $form['#submit'][] = 'profile_save_submit_handler';
+       } 
+
+        elseif ($form_id == "tools_node_form"){
+		$form['field_cc_license'][LANGUAGE_NONE]['#options']['_none'] = t('Select a License');
+		 hide($form['field_default_toolsnexamples_tag']);
+
+	}
+         elseif ($form_id == "case_study_node_form"){
+		 hide($form['field_default_toolsnexamples_tag']);
+		 $form['field_cc_license'][LANGUAGE_NONE]['#options']['_none'] = t('Select a License');
+	}
+         elseif ($form_id == "instructional_materials_node_form"){
+		 hide($form['field_default_toolsnexamples_tag']);
+		 $form['field_cc_license'][LANGUAGE_NONE]['#options']['_none'] = t('Select a License');
+	}
+         elseif ($form_id == "position_statements_node_form"){
+		 hide($form['field_default_toolsnexamples_tag']);
+		 $form['field_cc_license'][LANGUAGE_NONE]['#options']['_none'] = t('Select a License');
+	}
+         elseif($form_id == "insights_node_form"){
+              hide($form['field_default_toolsnexamples_tag']);
+			  $form['field_cc_license'][LANGUAGE_NONE]['#options']['_none'] = t('Select a License');
+        }
+		
+		elseif($form_id == "article_node_form"){             
+			  $form['field_cc_license'][LANGUAGE_NONE]['#options']['_none'] = t('Select a License');
+        }
+		
+		
+		
+      
+       elseif($form_id == "test_private_group_node_form"){
+        
+      
+       // $form['#submit'][] = 'alter_forms_groupadd_submit_handler';         
+
+        }
+
+        elseif($form_id == "comment_node_tools_form"){
+		   unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		   $form['comment_body']['#after_build'][] = 'alter_forms_customize_comment_form';
+        } 
+		
+		elseif($form_id == "comment_node_case_study_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		}
+		
+		elseif($form_id == "comment_node_insights_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		}
+		
+		elseif($form_id == "comment_node_instructional_materials_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		}
+		
+		elseif($form_id == "comment_node_public_event_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		}
+          
+		 elseif($form_id == "comment_node_discussion_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		} 
+		  
+		elseif($form_id == "comment_node_event_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		}  
+
+        elseif($form_id == "comment_node_poll_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		} 
+        
+		elseif($form_id == "comment_node_article_form"){
+		      unset($form['actions']['preview']);
+		   $form['actions']['submit']['#value'] = t('Submit');
+		}  
+
+ 		
+		  
+       elseif ($form_id == "og_ui_confirm_subscribe"){
+            
+            $form['#submit'][] = 'alter_forms_groupSubscribe_submit_handler'; 
+        }
+		
+		
+		elseif($form_id == "og_ui_add_users"){
+				unset($form['og_user']);
+				unset($form['membership_fields']);
+				unset($form['actions']['submit']);
+				
+				
+				$users = db_select('users', 's')->fields('s')->condition('s.uid', $GLOBALS['user']->uid, '!=')->condition('s.uid', 1, '!=')->execute()->fetchAll();
+				$userlist = array();  
+					foreach ($users as $user)
+					   $userlist[$user->uid] = $user->name;
+				
+				
+				
+	$form['og_user'] = array(
+     '#type' => 'fieldset',
+     '#title' => t('Invite member/s to join ' .$form['group']['#value']->label),
+    );
+    	
+	$form['og_user']['og_invite_user_provide'] = array(
+	'#type' => 'textfield',
+	'#title' => t('Provide the usernames you would like to invite'),
+	'#autocomplete_path' => 'users/autocomplete/multiple',
+	'#description' => t('Enter multiple names as comma separated values Like <b>name1, name2, name3</b>'),
+	'#default_value' => isset($def['og_invite_user_provide']) ? implode(",", unserialize($def['og_invite_user_provide'])) : NULL,
+	'#required' => TRUE,
+	);
+	
+	$form['og_user']['actions'] = array(
+		'#type' => 'submit', 
+		'#value' => t('Send Invitation'),
+		'#submit' => array('alter_forms_userInvite_submit_handler'),
+		
+		);			
+		 
+		}     
+
+}
+
+
+
+function alter_forms_userInvite_submit_handler(&$form, &$form_state){
+		
+	$userList = explode(',',$form_state['values']['og_invite_user_provide']);
+	foreach($userList as $userName){		
+		$user = db_select('users', 's')->fields('s')->condition('s.name', trim($userName), '=')->execute()->fetchAssoc();
+		$to = $user['mail'];
+		$currentUser = $GLOBALS['user'];
+		/*$subject = "Group Invitatin from T[H]INKER";
+		$body="Hello ".trim($userName). "! You have received an invitation from ". $currentUser->name. " to join ". $form_state['values']['group']->label. ". Please follow the link to accept the invitation http://t-h-inker.net/group/node/".$form_state['values']['group']->gid."/".$form_state['values']['group']->etid."/".$user['uid']."/invitation/".$form_state['values']['group']->label;
+		$params = array(
+		'subject' => $subject,
+		'body' => $body,
+		); REmove from drupal mail for html email*/
+		$invitationLink = "http://t-h-inker.net/group/node/".$form_state['values']['group']->gid."/".$form_state['values']['group']->etid."/".$user['uid']."/invitation/".$form_state['values']['group']->label;
+		$message = "<p>Hello, <b>".trim($userName). "</b>! You have received an invitation from ". $currentUser->name." to join ". $form_state['values']['group']->label. ". <br/>Please follow the link given below to accept the group invitation. <br/><br/>
+    		<a href = '".$invitationLink."'>Accept Group Invitation</a>";
+	   
+	   if ($user){
+	   drupal_set_message('Group invitation has been successfully sent to <b>'.trim($userName).'</b>');
+	   $subject = "Group Invitation from T[H]INKER";
+	  // drupal_mail('alter_forms', 'group_invitation', $to, language_default(), $params, $currentUser->mail, TRUE);
+	   sendGroupInvitation($to, $subject, $message); // Replaced drupal mail html email
+
+	}
+	else{
+			drupal_set_message('<b>'.trim($userName).'</b> does not exist');
+		}   		
+	}	
+			drupal_goto('node/'.$form_state['values']['group']->etid); 	
+}
+
+
+
+
+
+
+
+
+function alter_forms_groupadd_submit_handler(&$form, &$form_state){
+
+
+  /*$item = array(
+  'link_path' => 'node/303',
+  'router_path' => 'node/%',
+  'plid' => 902,
+  'menu_name' => 'main-menu', 
+  'link_title' => $form_state['values']['title'],
+  
+  
+);
+menu_link_save($item);*/
+ 
+}
+
+
+function alter_forms_node_insert($node){
+
+
+$pid = 0;
+$node_type = $node->type;
+if ($node_type ==  'newsitem')$pid = 1285;
+else if($node_type == 'faq' )$pid = 1284;
+else if ($node_type == 'public_event')$pid = 820;
+/*else if($node_type == 'tools')$pid = 993;
+else if($node_type == 'case_study')$pid = 994;
+else if($node_type == 'instructional_materials')$pid = 996;
+else if($node_type == 'position_statements')$pid = 997; 
+else if($node_type == 'insights')$pid = 995; */
+else if ($node_type == 'test_private_group'){
+if($node->group_access['und'][0]['value'] == 0)$pid = 989;
+else $pid = 990;
+}
+
+
+
+ 
+else if ($node_type ==  'article' || $node_type == 'discussion' || $node_type == 'event' || $node_type == 'external_link' || $node_type == 'poll' || $node_type == 'file' || $node_type == 'photo_gallery')
+{
+
+//$pid = 902;
+$gid = $node->group_audience['und'][0]['gid'];
+$userIds  = db_select('og_membership', 'm')
+              ->fields('m')
+              ->condition('m.gid', $gid, '=')
+              ->condition('m.entity_type', 'user', '=')
+              ->execute()
+              ->fetchAll();
+$nodeId = db_select('og', 'o')
+              ->fields('o')
+              ->condition('o.gid', $gid, '=')
+              ->execute()
+              ->fetchAssoc();
+$plid = db_select('menu_links', 'l')
+              ->fields('l')
+              ->condition('l.link_path', 'node/'.$nodeId['etid'], '=')
+              ->execute()
+              ->fetchAssoc();
+
+$pid = $plid['mlid'];
+foreach ($userIds as $userId){
+	if ($GLOBALS['user']->uid != $userId->etid){
+	 $result  = db_select('save_user_settings', 'u')
+	              ->fields('u')
+	              ->condition('u.uid', $userId->etid, '=')
+	              ->execute()
+	              ->fetchAssoc();
+		if ($result['email_user_activity_group']){
+		$user= db_select('users', 's')
+		              ->fields('s')
+		              ->condition('s.uid', $result['uid'], '=')
+		              ->execute()
+		              ->fetchAssoc();
+		$email = $user['mail'];
+
+		$mailfrom = "info@thinker.com";
+		$subject = "New Post in Group";
+		$body='Hello <b>'.$user['name']. '</b>! <br/>There is a new post called <a href = "http://t-h-inker.net/node/'.$node->nid.'">'.$node->title.'</a> that belongs to one of the groups you are subscribed to.';
+		/*$params = array(
+		    'subject' => $subject,
+		    'body' => $body,
+		    );
+		drupal_mail('alter_forms', 'group_content', $email, language_default(), $params, $mailfrom, TRUE);*/
+
+			sendGroupInvitation($user['mail'], $subject, $body);
+		}
+	}
+}
+
+}
+else if($node_type == 'tools')$pid = 993;
+else if($node_type == 'case_study')$pid = 994;
+else if($node_type == 'instructional_materials')$pid = 996;
+else if($node_type == 'position_statements')$pid = 997; 
+else if($node_type == 'insights')$pid = 995;
+
+
+
+$item = array(
+  'link_path' => "node/$node->nid",
+  'router_path' => 'node/%',
+  'plid' => $pid,
+  'menu_name' => 'main-menu', 
+  'link_title' => "$node->title",
+  
+  
+);
+menu_link_save($item);
+
+
+// For sending Email
+
+
+
+
+
+
+
+
+
+/*if ($node_type ==  'newsitem'){
+   $item = array(
+  'link_path' => "node/$node->nid",
+  'router_path' => 'node/%',
+  'plid' => 1285,
+  'menu_name' => 'main-menu', 
+  'link_title' => "$node->title",
+  
+  
+);
+menu_link_save($item);
+}
+
+ 
+else if ($node_type ==  ('article' || 'discussion' || 'event' || 'external_link' ||  'poll')){
+   $item = array(
+  'link_path' => "node/$node->nid",
+  'router_path' => 'node/%',
+  'plid' => 902,
+  'menu_name' => 'main-menu', 
+  'link_title' => "$node->title",
+  
+  
+);
+menu_link_save($item);
+}
+
+else if($node->group_access['und'][0]['value'] == 0){
+    
+   $item = array(
+  'link_path' => "node/$node->nid",
+  'router_path' => 'node/%',
+  'plid' => 989,
+  'menu_name' => 'main-menu', 
+  'link_title' => "$node->title",
+  
+  
+);
+menu_link_save($item);
+
+}
+
+else if($node->group_access['und'][0]['value'] == 1){
+    
+   $item = array(
+  'link_path' => "node/$node->nid",
+  'router_path' => 'node/%',
+  'plid' => 990,
+  'menu_name' => 'main-menu', 
+  'link_title' => "$node->title",
+  
+  
+);
+menu_link_save($item);
+
+}
+*/
+}
+
+function alter_forms_groupSubscribe_submit_handler(&$form, &$form_state){
+    
+// drupal_goto('news-events');
+}
+
+
+
+function profile_save_submit_handler(&$form, &$form_state) {
+ // $form_state['redirect'] = 'toMyProfile';
+	$form_state['redirect'] = 'user';
+}
+
+
+function user_registered_submit_handler(&$form, &$form_state){
+
+ $mail = $form_state['values']['mail'];
+$uid = db_select('users', 'u')
+              ->fields('u')
+              ->condition('u.mail', $mail, '=')
+              ->execute()
+              ->fetchAssoc();
+
+
+
+
+   db_insert('save_user_settings')     
+			->fields(array(
+			'uid' => $uid['uid'],
+			'new_newsitems' => 1,
+			'new_events' => 1,
+			'new_groups' => 1,
+			'workspaces_invites' => 1,
+			'user_subscribe' => 1,
+			'user_activity_workspace' => 1,
+           'user_activity_group' => 1,
+           'user_activity_subscription' => 1,
+           'forward_invitations' => 1,
+           'forward_subscription' => 1,
+          
+       ))
+    ->execute();
+}
+
+
+
+function alter_forms_customize_comment_form(&$form) {  
+    $form[LANGUAGE_NONE][0]['format']['#access'] = FALSE; 
+    return $form;  
+}
+
+function alter_forms_node_view($node, $view_mode, $langcode){
+   /* if ($node->type == 'tools' && $view_mode == 'full' && arg(0) == 'node') {
+    
+  }*/
+  if (($node->type == 'tools' || $node->type == 'instructional_materials' || $node->type == 'position_statements' || $node->type == 'case_study' || $node->type == 'insights') && $view_mode == 'full' && arg(0) == 'node') {
+    
+    //drupal_goto('displaythis/' . $node->nid); 
+  }
+else if ($node->type == 'external_link' && $view_mode == 'full' && arg(0) == 'node'){
+		 
+      $http = "http://"; 
+      $url = $node->field_link_url['und'][0]['value']; 
+      $group = og_load_entity_from_group($node->group_audience['und'][0]['gid']);  
+      $self_url = $group->nid;  	
+	   if (substr($url, 0, 7) != $http) $url = "http://".$url;    
+		echo "<script type = 'text/javascript'>";
+		echo "window.open('$url');";
+		echo "window.open('$self_url', '_self');";
+		echo "</script>";
+       } 
+elseif ($node->type == 'link_tool_or_example' && $view_mode == 'full' && arg(0) == 'node'){
+
+     // drupal_goto('displaythis/'. $node->field_choose_tool_or_example['und'][0]['target_id']);
+}
+
+}
+
+
+function alter_forms_comment_view_alter(&$build){
+
+
+
+}
+
+
+
+
+
+function alter_forms_menu_alter(&$items) {
+  /*THE SOLUTION -- http://stackoverflow.com/questions/3408602/drupal-set-user-edit-uprofile-to-default-tab-on-user-edit */
+  
+  $items['user/%user/view']['type'] = MENU_LOCAL_TASK;
+  //$items['user/%user/view']['title'] = 'Account';
+  $items['user/%user/view']['page callback'] = $items['user/%user']['page callback'];
+  $items['user/%user/view']['page arguments'] = $items['user/%user']['page arguments'];
+  $items['user/%user/view']['access callback'] = $items['user/%user']['access callback'];
+  $items['user/%user/view']['access arguments'] = $items['user/%user']['access arguments'];
+ 
+// This must higlight the Community & Members Menu Tab
+ $items['user/%user']['menu_name'] = 'main-menu'; $items['user/%user']['depth'] = 2; $items['user/%user']['plid'] = 1386; $items['user/%user']['p1'] = 1386; $items['user/%user']['p2'] = 953;
+ 
+ //unset($items['user/%user/view']['weight']);
+$items['user/%user/edit']['type'] = MENU_CALLBACK;
+
+ 
+
+$items['user/%user/uProfile']['page callback'] = 'load_profileTab_asDefault'; 
+$items['user/%user/uProfile']['page arguments'] = array(1);
+
+$items['user/%user']['page callback'] = $items['user/%user/uProfile']['page callback'];
+$items['user/%user']['page arguments'] = $items['user/%user/uProfile']['page arguments'];
+
+$items['user/%user/uProfile']['type'] = MENU_DEFAULT_LOCAL_TASK;
+$items['user/%user/uProfile']['weight'] = -10;
+//$items['user/%user/account']['page callback'] = $items['user/password']['page callback'];
+
+}
+
+function load_profileTab_asDefault($userid){
+  drupal_goto('user/'.$userid->uid.'/uProfile');
+}
+
+
+
+function alter_forms_menu()
+{	
+	/*if($GLOBALS['user']->uid==$user->uid)
+	{
+		$items['user/%user/changePassword'] = array(
+    		'title' => t('Change Password'),
+    		'page callback' => 'load_passwordChange_tab',
+    		'page arguments' => array(1),
+    		'access callback' => TRUE,
+    		//'access arguments' => array('access funky button'),
+    		'type' => MENU_LOCAL_TASK,
+	);
+	return $items;
+} */
+	$items = array();	
+		$items['group/node/%/%/%/invitation'] = array(
+    		'page callback' => 'auto_subscribe_user_invited',
+    		'page arguments' => array(0,1,2,3,4,5),
+    		'access callback' => TRUE,
+			'access arguments' => array('user_is_logged_in'),
+    		'type' => MENU_CALLBACK,
+		);
+	
+	
+		$items['users/autocomplete/multiple'] = array(
+		'title' => '',
+		'page callback' => 'users_autocomplete_multiple',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		);
+		
+		$items['send_user_feedback'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('send_feedback_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+	return $items;	
+}
+
+/* function load_passwordChange_tab($user){
+  	drupal_set_title('Request New Password page');  
+ 	if ($_SERVER['REQUEST_METHOD'] == 'POST')
+	{      drupal_set_message("You must log out to use the password reset link in the e-mail.");
+		processPasswordResetForm();
+		return "Further instructions have been sent to your e-mail address.";
+	}
+	else
+	{     	$account = user_load(arg(1));
+		return "Password reset instructions will be emailed to ". $account->mail. "
+   		<form method='POST'>
+  		<br> <input type='submit' value='Email New Password'>
+    		</form>";
+	}
+}
+
+
+function processPasswordResetForm()
+{
+	$account = user_load(arg(1));
+	_user_mail_notify('password_reset', $account);
+}
+*/
+
+
+function alter_forms_mail($key,&$message,$params) {
+   
+    switch ($key) {
+        case 'group_content':
+            $message['subject']=t($params['subject']);
+            $message['body'][]=$params['body'];
+            $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+        break;
+		
+		case 'group_invitation': 
+		    $message['subject']=t($params['subject']);
+            $message['body'][]=$params['body'];
+			$message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+        break;
+		
+		case 'send_feedback':
+			$message['subject']=t($params['subject']);
+            $message['body'][]=$params['body'];
+			$message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+        break;
+    }
+}
+
+
+function alter_forms_admin_paths_alter(&$paths) {
+    $paths['save_settings_uzr'] = TRUE;
+    $paths['convert_content_type/*'] = TRUE;
+	$paths['node_like_flag/*'] = TRUE;
+    
+}
+
+
+function hover_over_text(&$form, &$form_state) {
+        $form['name']['#weight'] = -3;
+		$form['name']['#required'] = false;
+ 		$form['pass']['#weight'] = -2; 
+		$form['pass']['#required'] = false;
+ 		$form['actions']['#weight'] = -1; 
+        $form['actions']['#attributes']['class'][] = 'shift';
+show($form['name']); show($form['pass']); show($form['actions']); show($form['links']);
+hide($form['stupid_ajax_link']);
+return $form;
+}
+
+
+
+function auto_subscribe_user_invited(){
+
+$node_id = arg(3); $user = $GLOBALS['user'];
+$account = user_load($user->uid); $group = og_load(arg(2));
+	if ($user->uid == arg(4)  && arg(0) == 'group' && $group->etid == $node_id){
+		if (og_is_member($group->gid, 'user', $account, array(OG_STATE_ACTIVE))){		
+		drupal_set_message("You are already a member of <b>". $group->label."</b>");
+	}
+	else {
+		og_group($group->gid, array('entity' => $account));
+		drupal_set_message("You have successfully subscribed to <b>". $group->label."</b>");
+	}
+	drupal_goto('node/'.$node_id);
+	}
+else drupal_goto('workspaces-type');
+
+}
+
+
+
+function users_autocomplete_multiple($string = '') {
+
+  $matches = array();
+  $array = explode(',', $string);
+  $last_string = trim(array_pop($array));
+ 
+  if ($last_string) {
+    $result = db_select('users')->fields('users', array('name'))->condition('name', db_like($last_string) . '%', 'LIKE')->condition('status', 0, '<>')->range(0, 10)->execute();
+    foreach ($result as $user) {
+	 $prefix = count($array) ? implode(', ', $array) .', ' : '';
+      $matches[$prefix.$user->name] = check_plain($user->name);
+    }
+  }
+  
+  drupal_json_output($matches);
+  
+}
+
+
+
+
+
+
+
+/*
+
+Feed Back Form
+
+*/
+
+
+function send_feedback_form($form, &$form_state) {
+  
+  $form['#attached']['css'] = array(
+    drupal_get_path('module', 'alter_forms') . '/alter_forms.css',
+  );
+  
+  $form['fieldset_feedback'] = array(
+  '#type' => 'fieldset',
+  '#title' => t('Send feedback'),
+  '#collapsible' => FALSE,
+  );
+	$form['fieldset_feedback']['feedback_type'] = array(
+    '#type' => 'radios',
+	'#options' => drupal_map_assoc(array(t('Comment'), t('Complaint'), t('Request'))),
+    '#title' => t('<b>Message Type</b>'),
+	
+	
+  );
+  
+  $form['fieldset_feedback']['feedback_subject'] = array(
+    '#type' => 'textfield',
+    '#title' => t('<b>Regarding</b>'),
+	'#size' => 25, 
+	'#prefix' => '<div class = "feedback_message_floater">'
+  );    
+  
+	$form['fieldset_feedback']['feedback_message'] = array(
+    '#type' => 'textarea',
+    '#title' => t('<b>Your Message</b>'),
+	 '#cols' => 40,
+	 '#rows' => 5,
+	
+	
+  );
+  
+  $form['fieldset_feedback']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+	'#suffix' => '</div>',
+	);
+    $form['fieldset_feedback']['feedback_firstName'] = array(
+    '#type' => 'textfield',
+    '#title' => t('<b>First Name</b>'),
+	'#size' => 25, 
+	
+	'#prefix' => '<div class = "feedback_user_floater">'
+    );
+	
+	 $form['fieldset_feedback']['feedback_lastName'] = array(
+    '#type' => 'textfield',
+    '#title' => t('<b>Last Name</b>'),
+	'#size' => 25, 
+	
+  );
+  $form['fieldset_feedback']['feedback_email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('<b>Email</b>'),
+	'#size' => 25, 
+	
+	'#suffix' => '</div>',
+  ); 
+  
+  
+  
+  return $form;
+}
+
+
+function send_feedback_form_validate($form, &$form_state) {
+  // Call step validate handler if it exists.
+  if(!$form_state['values']['feedback_type']) form_set_error('feedback_type', t('<b>Message type</b> field is not selected')); 
+  if(!$form_state['values']['feedback_firstName']) form_set_error('feedback_firstName', t('<b>First Name</b> is required')); 
+  if(!$form_state['values']['feedback_email']){ form_set_error('feedback_email', t('<b>Email Address</b> is required')); }
+  if ($form_state['values']['feedback_email']){ 
+  $regex = '/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/'; 
+  $email = $form_state['values']['feedback_email'];
+  if (!valid_email_address($email)) {
+     form_set_error('feedback_email', t('<b>Email Address</b> is incorrect')); 
+}
+}  
+  if(!$form_state['values']['feedback_message']) form_set_error('feedback_message', t('<b>Message</b> is required'));  	
+}
+
+
+
+function send_feedback_form_submit($form, &$form_state) {
+  
+  $body = 'Feedback from '.$form_state['values']['feedback_firstName']. ' '. $form_state['values']['feedback_lastName']. ' Email: '.$form_state['values']['feedback_email'].' Message: '.  $form_state['values']['feedback_message'];
+  
+  $params = array(
+		'subject' => $form_state['values']['feedback_type']. ' Regarding '.$form_state['values']['feedback_subject'] ,
+		'body' => $body,
+		);
+  
+  drupal_mail('alter_forms', 'send_feedback', 'dipen.hamal@metropolia.fi', language_default(), $params, 'info@thinker.net', TRUE);	
+  
+  drupal_set_message('Thank you for taking the time to fill out our feedback form.');
+  drupal_goto('<front>');
+
+  
+  return;
+}
+
+
+
+
+
+/*
+
+End of Feed Back Form
+
+*/
+
+
+
+
+
+
+
+/*
+Send Group Invitation
+*/
+function sendGroupInvitation($to, $subject, $message){
+    
+    $body = "
+    <html>
+    <head>
+    <title>Group Invitation</title>
+    </head>
+    <body>
+
+    ".$message."
+    <h3>T[H]INKER</h3>
+    </body>
+    </html>
+    ";
+
+    // Always set content-type when sending HTML email
+    $headers = "MIME-Version: 1.0" . "\r\n";
+    $headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
+
+    // More headers
+    $headers .= 'From: <donotreply@thinker.net' . "\r\n";
+   // $headers .= 'Bcc: dipen.hamal@metropolia.fi' . "\r\n";
+
+    mail($to,$subject,$body,$headers);
+}
+
+/*
+Daily digest Email @Dipen.....
+*/
+
+function alter_forms_cron(){	
+		$subject = 'daily digest from T[h]inker';
+		$cron_last_run = variable_get('cron_last'); $cron_run_now = REQUEST_TIME;
+		
+		$difference_in_time = $cron_run_now-$cron_last_run;
+
+	if($difference_in_time>= 86400){
+
+		$get_all_users = db_select('save_user_settings', 's')->fields('s')->condition('s.daily_summary', 1, '=')->execute()->fetchAll();
+		if(sizeof($get_all_users)>0){
+			$query = db_select('node', 'n');
+			$query->join('users', 'u', 'u.uid = n.uid');
+	        $query->fields('n')->fields('u', array('name'));
+	        $db_or = db_or();
+		        $db_or->condition('n.changed', $cron_last_run, '>');
+				$db_or->condition('n.created', $cron_last_run, '>');      
+	        $query->condition($db_or);
+
+	        $get_latest_nodes = $query->execute()->fetchAll();
+
+	           $comments = db_select('comment', 'c');           
+	           $comments->join('node', 'n', 'c.nid = n.nid');
+	           $comments->fields('c')->fields('n', array('title'));
+		       $comments->condition('c.created', $cron_last_run, '>');
+	   	       $comments = $comments->orderBy('c.created', 'DESC')->execute()->fetchAll();
+	            $message = '';
+	            foreach($get_all_users as $user_digest){
+	            		$message = '<div style = "background-color: #42a9ba; border:2px solid black; width:600px; margin-left:30px;"><span style = "font-size: 1.2em;" >Your Daily Digest</span><br/><span style = "font-size: 0.7em;" >Everything that happened in the last 24 hours.</span>';
+	            $message_new_nodes = '<b>new posts</b><br/>';
+	            $message_updated_nodes = '<b>updated post</b><br/>';
+	            $message_new_comments = '<b>new comments</b><br/>';
+	            $message_activites_groups = '<b>Activities in your groups</b> <br/>';
+	            $account = user_load($user_digest->uid); $groupContent = 0; $newContents = 0; $updatedContent = 0; $group_content_array = array();
+	           // $groupActivityCount = 0;
+				    if(sizeof($get_latest_nodes)>0){
+				       	foreach($get_latest_nodes as $new_node){
+				       		$node_type = $new_node->type;
+				           		if ($node_type ==  'article' || $node_type == 'discussion' || $node_type == 'event' || $node_type == 'external_link' || $node_type == 'poll' || $node_type == 'file' || $node_type == 'photo_gallery'){
+				   					//$message_activites_groups = loadGroupInformation($new_node->nid, $account, $user_digest->uid, $message_activites_groups);
+				   					$group_content_array[$groupContent] = $new_node->nid;
+				   					++$groupContent;
+					            }
+					            else{
+					              	$created = $new_node->created; $changed = $new_node->changed;
+					              	if($created<$changed){
+					              		$message_updated_nodes .= modifyMessage($new_node->nid, $new_node->title,'updated', $new_node->uid, $new_node->name, $user_digest->uid); ++$updatedContent;
+					              	}
+					              	else {
+					              		$message_new_nodes .= modifyMessage($new_node->nid, $new_node->title,'created', $new_node->uid, $new_node->name, $user_digest->uid); ++$newContents;
+					              	}
+					            }
+				        }
+				    }
+				    $commentGroupContent = array(); 
+				    if(sizeof($comments)>0){
+				    	foreach($comments as $comment){
+				    		$nodeCommented = node_load($comment->nid);
+				    		if($nodeCommented->group_audience){
+				    			if(og_is_member($nodeCommented->group_audience['und'][0]['gid'], 'user', $account)){
+				    				array_push($commentGroupContent,$comment);
+				    				//array_shift($comments);				    				
+				    			}
+				    			array_shift($comments);	
+				    		}
+				    	}
+				    }
+
+				    //if(sizeof($group_content_array)>0 || sizeof($commentGroupContent)>0){
+				    	$completeGroupContent = mergeContentsGroup($group_content_array);
+				    	$message_activites_groups = loadGroupRelatedContent($completeGroupContent, $commentGroupContent, $account, $user_digest->uid, $message_activites_groups);
+				    //}
+				    /*if($groupContent == 0 && sizeof($commentGroupContent) == 0)$message_activites_groups .= '<span style= "margin-left: 30px;">There were no activites in your groups</span>';*/
+				    if($newContents == 0)$message_new_nodes .= '<span style= "margin-left: 30px;">No posts were created</spam>';
+				    if($updatedContent == 0)$message_updated_nodes .= '<span style= "margin-left: 30px;">No posts were updated</span>';
+				    if(sizeof($comments) <= 0){$message_new_comments .= '<span style= "margin-left: 30px;">No comments were created</span>';}
+				    else{
+				    	foreach($comments as $comment){
+				    		$userComment = user_load($comment->uid);
+				    		$message_new_comments .= '<span style= "margin-left: 30px;"><a href = "http://t-h-inker.net/user/'.$comment->uid.'">'.$userComment->name.'</a> created new <a href ="http://t-h-inker.net/comment/'.$comment->cid.'/#comment-'.$comment->cid.'">comment</a></span><br/>';
+				    	}
+				    }	//	$groupActivityCount = sizeof($commentGroupContent)+ $groupContent;	    
+					$message .= '<hr>'.$newContents .' '. $message_new_nodes;
+					$message .= '<hr>'.$updatedContent.' '.$message_updated_nodes;
+					$message .= '<hr>'.sizeof($comments).' '.$message_new_comments;					
+					//$message .= '<hr>'.$groupActivityCount.' '.$message_activites_groups;
+					$message .= '<hr>'.$message_activites_groups;
+					$message .= '</div>';
+					
+	    			//sendGroupInvitation('dipen.hamal@metropolia.fi', $subject, $message);
+	    			sendGroupInvitation($account->mail, $subject, $message);		    			
+	    		}
+	    	}
+
+    } else sendGroupInvitation('dipen.hamal@metropolia.fi', $subject, '$message');
+}
+
+
+/*function loadGroupInformation($nid, $account, $uid, $message){
+	$group_label = og_label($gid);
+	$new_node = node_load($nid);	
+	$gid = $new_node->group_audience['und'][0]['gid']; 
+	drupal_set_message($group_label);
+	if(og_is_member($gid, 'user', $account)){
+		if($new_node->created<$new_node->changed){
+		    $message .= modifyMessage($nid, $new_node->title,'updated', $uid, $new_node->name);
+		}
+		else {
+			$message .= modifyMessage($nid, $new_node->title,'created', $uid, $new_node->name);
+		}
+	}	
+	return $message;
+
+}*/
+
+function loadGroupRelatedContent($GroupContentArray, $commentGroupContent, $account, $uid, $message){
+		$gids = array_keys($GroupContentArray); $ownGroupContent = 0;
+		for($i = 0; $i<count($gids); $i++){
+			if(og_is_member($gids[$i], 'user', $account)){
+				++$ownGroupContent;
+				$grp = og_load($gids[$i]);
+				$message .= '<span style = "margin-left: 30px;"><a href = "http://t-h-inker.net/node/'.$grp->etid.'">'.$grp->label.'</a></span><br/>';				
+				foreach($GroupContentArray[$gids[$i]] as $groupContent){
+					if($groupContent->created<$groupContent->changed){
+				    	//$message .= '<span style = "margin-left: 60px;">'.modifyMessage($groupContent->nid, $groupContent->title,'updated', $groupContent->uid, $groupContent->name, $uid).'</span>';
+				    	if($uid != $groupContent->uid ){
+				    		$userofContent = user_load($groupContent->uid);
+				    		$message .= '<span style = "margin-left: 60px;"><a href = "http://t-h-inker.net/user/'.$groupContent->uid.'">'.$userofContent->name.'</a> updated <a href = "http://t-h-inker.net/node/'.$groupContent->nid.'">group activity</a></span><br/>';
+				   		 }
+				   		 else{
+				    		$userofContent = user_load($groupContent->uid);
+				    		$message .= '<span style = "margin-left: 60px;">You updated <a href = "http://t-h-inker.net/node/'.$groupContent->nid.'">group activity</a></span><br/>';
+				   		 }
+					}
+					else {
+						//$message .= '<span style = "margin-left: 60px;">'.modifyMessage($groupContent->nid, $groupContent->title,'created new', $groupContent->uid, $groupContent->name, $uid).'</span>';
+						if($uid != $groupContent->uid ){
+							$userofContent = user_load($groupContent->uid);
+							$message .= '<span style = "margin-left: 60px;"><a href = "http://t-h-inker.net/user/'.$groupContent->uid.'">'.$userofContent->name.'</a> created new <a href = "http://t-h-inker.net/node/'.$groupContent->nid.'">group activity</a></span><br/>';
+						}
+						else{
+							$message .= '<span style = "margin-left: 60px;">You created new <a href = "http://t-h-inker.net/node/'.$groupContent->nid.'">group activity</a></span><br/>';
+						}
+					}
+					foreach($commentGroupContent as $comment){
+						if($comment->nid == $groupContent->nid){
+							$user = user_load($comment->uid); $site_url = "http://t-h-inker.net/";
+							if($comment->uid != $uid )
+							$message .= '<span style = "margin-left: 60px;">
+							<a href = "'.$site_url.'user'.$comment->uid.'">'.$user->name.'</a> created new <a href ="'.$site_url.'comment/'.$comment->cid.'/#comment-'.$comment->cid.'">comment</a></span><br/>';
+							else 
+								$message .= '<span style = "margin-left: 60px;">
+							    you commented, <a href ="'.$site_url.'comment/'.$comment->cid.'/#comment-'.$comment->cid.'">'.$comment->subject.'</a></span><br/>';	
+							array_shift($commentGroupContent);						
+						}						
+					}
+				
+				}			
+			}
+		}
+		$groupComment = 0;
+		if(count($commentGroupContent)>0){
+			foreach($commentGroupContent as $comment){
+			$groupComment++;	
+				$new_node = node_load($comment->nid); $gid = $new_node->group_audience['und'][0]['gid'];
+				$grp = og_load($gid);							
+				$user = user_load($comment->uid); $site_url = "http://t-h-inker.net/";
+				if($comment->uid != $uid)
+				$message .= '<span style = "margin-left: 30px;">In <a href = "'.$site_url.'/node/'.$grp->etid.'">'.$grp->label.' 
+					</a>,  <a href = "'.$site_url.'/user/'.$comment->uid.'">'.$user->name.'</a> created a new <a href ="'.$site_url.'/comment/'.$comment->cid.'/#comment-'.$comment->cid.'">comment</a></span><br/>';
+				else 
+					$message .= '<span style = "margin-left: 30px;">In Group, <a href = "'.$site_url.'/node/'.$grp->etid.'">'.$grp->label.' 
+					</a>,  you created a new <a href ="'.$site_url.'/comment/'.$comment->cid.'/#comment-'.$comment->cid.'">comment </a></span><br/>';
+				array_shift($commentGroupContent);						
+			}
+		}
+		$groupActivityCount = $ownGroupContent + $groupComment;
+		$message = $groupActivityCount. ' '. $message;
+		if($groupActivityCount == 0){
+			$message .= '<span style= "margin-left: 30px;">There were no group activities</span>';
+		}		
+		
+	return $message;
+}
+
+function modifyMessage($nid, $title, $modifier, $uid, $name, $emailOwner){
+	if($uid != $emailOwner)
+	$message = '<span style = "margin-left: 30px;"><a href = "http://t-h-inker.net/user/'.$uid.'">'.$name.'</a> '.$modifier.' <a href = "http://t-h-inker.net/node/'.$nid.'">post</a></span><br/>';
+	else 
+		$message =  '<span style = "margin-left: 30px;">You '.$modifier. ' <a href = "http://t-h-inker.net/node/'.$nid.'">post</a></span><br/>';
+	return $message;
+}
+
+function mergeContentsGroup($group_content_array){
+	$group_array = array(); $groupId = array();
+	foreach($group_content_array as $new_node){
+		$node_complete = node_load($new_node);
+		$gid = $node_complete->group_audience['und'][0]['gid'];
+		if(in_array($gid, $groupId)){
+			$group_array[$gid][sizeof($group_array[$gid])] = $node_complete;
+		}
+		else{
+			array_push($groupId, $gid);
+			$group_array[$gid] = array();
+			array_push($group_array[$gid], $node_complete);
+		}		
+	}
+	//drupal_set_message('<pre>'. print_r($group_array, TRUE) .'</pre>');  	
+	return $group_array;
+}
+
+
+//Send Email from Settings
+
+function alter_forms_node_update($node){
+	$subject = "Post updated in Group"; $modifier = "updated"; $cMessage = "";
+	email_group_activity($node, $subject, $modifier, $cMessage);
+}
+
+
+function alter_forms_node_delete($node){
+	$subject = "Post deleted in Group"; $modifier = "deleted"; $cMessage = "";
+	email_group_activity($node, $subject, $modifier, $cMessage);
+}
+
+function alter_forms_comment_insert($comment){
+	$node = node_load($comment->nid); $subject = "New comment in the post"; $modifier = "commented";
+	$cUser = user_load($comment->uid);
+	$cMessage = '<a href = "http://t-h-inker.net/user/"'.$comment->uid.'">'.$cUser->name.'</a> <a href ="http://t-h-inker.net/comment/'.$comment->cid.'#comment-'.$comment->cid.'">commented</a> on ';
+	email_group_activity($node, $subject, $modifier, $cMessage);
+}
+
+
+function email_group_activity($node, $subject, $modifier, $cMessage){	
+	$node_type = $node->type;
+	if ($node_type ==  'article' || $node_type == 'discussion' || $node_type == 'event' || $node_type == 'external_link' || $node_type == 'poll' || $node_type == 'file' || $node_type == 'photo_gallery')
+	{
+		$gid = $node->group_audience['und'][0]['gid'];
+		$userIds  = db_select('og_membership', 'm')
+		            ->fields('m')->condition('m.gid', $gid, '=')->condition('m.entity_type', 'user', '=')->execute()->fetchAll();
+		foreach ($userIds as $user){ 
+			if($user->etid !=$GLOBALS['user']->uid){
+				$result  = db_select('save_user_settings', 'u')
+		              ->fields('u')->condition('u.uid', $user->etid, '=')->execute()->fetchAssoc();
+				if ($result['email_user_activity_group']){
+					$user_is = user_load($user->etid);
+					if($modifier == 'deleted')
+						$body ='Hello <b>'.$user_is->name. '</b>! <br/><u>'.$node->title.'</u> that belonged to one of your groups was '. $modifier;
+					else if ($modifier == 'updated')
+						$body ='Hello <b>'.$user_is->name. '</b>! <br/><a href = "http://t-h-inker.net/node/'.$node->nid.'">'.$node->title.'</a> that belongs to one of your groups was updated. ';
+					else if ($modifier == "commented"){
+						$body ='Hello <b>'.$user_is->name. '</b>!<br/> '.$cMessage.'<a href = "http://t-h-inker.net/node/'.$node->nid.'">'.$node->title.'</a> that belongs to one of your groups.';
+					}				
+					sendGroupInvitation($user_is->mail, $subject, $body);
+				}
+			}		
+		}
+	}
+	else{
+		if($modifier == "commented"){
+			if($node->uid != $GLOBALS['user']->uid){
+				$author = user_load($node->uid);
+				$body = 'Hello <b>'.$author->name. '</b>!<br/> '.$cMessage.' one of your posts, <a href = "http://t-h-inker.net/node/'.$node->nid.'">'.$node->title.'</a>';
+				sendGroupInvitation($author->mail, $subject, $body);
+			}
+		}
+	}
+}
+
+
+
+?>

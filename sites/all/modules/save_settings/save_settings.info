@@ -1,0 +1,5 @@
+name = Save Settings for User
+description = Allows saving individual settigs for content items.
+core = 7.x
+package = Save User Settings
+dependencies[] = "block"

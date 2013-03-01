@@ -1,0 +1,695 @@
+<?php
+
+ function save_settings_menu() {  
+  $items['save_settings_uzr'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('save_settings_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  
+ //'title' => 'Export As',
+  return $items;
+}
+
+
+function save_settings_form($form, &$form_state) {
+  
+    $form_state['storage'] = array(
+      'step' => 'save_settings_form_personal',
+    );
+  $function = $form_state['storage']['step'];
+  $form = $function($form, $form_state);
+  return $form;
+}
+
+function save_settings_form_validate($form, &$form_state) {
+  // Call step validate handler if it exists.
+  if (function_exists($form_state['storage']['step'] . '_validate')) {
+    $function = $form_state['storage']['step'] . '_validate';
+    $function($form, $form_state);
+  }
+  return; 
+}
+
+
+function save_settings_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  
+    // Record step.
+    $step = $form_state['storage']['step'];
+    $form_state['storage']['steps'][] = $step;
+    // Call step submit handler if it exists.
+    if (function_exists($step . '_submit')) {
+      $function = $step . '_submit';
+      $function($form, $form_state);
+    }
+  
+  return;
+}
+
+
+function save_settings_form_personal($form, &$form_state) {
+
+$form['#attached']['css'] = array(
+    drupal_get_path('module', 'save_settings') . '/save_settings.css',
+  );
+  
+
+$userId = $GLOBALS['user']->uid;
+  $check_uid_user = db_select('save_user_settings', 's')
+   ->fields('s')
+   ->condition('s.uid', $userId, '=') 
+   ->execute()
+   ->fetchAssoc();
+
+  $check_uid_bookmark = db_select('save_bookmark_settings', 's')
+   ->fields('s')
+   ->condition('s.uid', $userId, '=') 
+   ->execute()
+   ->fetchAssoc();
+
+
+ // For activity...
+$form['activity_settings_infrom'] = array(
+  '#markup' => t("These settings determine what community activities are to be displayed in the \"What's happening\" section and what notifications should be send by e-mail.</p>"),  
+  '#prefix' => '<div class = "save_settings_form_information" >',   
+);
+$form['activity_settings']['notify'] = array(
+    '#type' => 'fieldset',
+    '#title' => t("T[h]inker.net flashfeed (\"What's happening?\")"),
+    '#description' => t(''),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#prefix' => '<div class = "save_settings_form">',    
+  );
+  $form['activity_settings']['notify']['new_newsitems'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Creation of new newsitems'),
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' => $check_uid_user['new_newsitems'] ? $check_uid_user['new_newsitems'] : 0 , 
+    
+   );
+  $form['activity_settings']['notify']['new_events'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Creation of new events'), 
+   '#attributes' => array('class' => array('checkbox_label'),),
+   '#default_value' => $check_uid_user['new_events'] ? $check_uid_user['new_events']: 0 ,
+   );
+$form['activity_settings']['notify']['new_groups'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Creation of new group'), 
+     '#attributes' => array('class' => array('checkbox_label'),),
+     '#default_value' => $check_uid_user['new_groups'] ? $check_uid_user['new_groups']: 0 ,
+   );
+$form['activity_settings']['notify']['workspaces_invites'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Group invitation'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' => $check_uid_user['workspaces_invites'] ? $check_uid_user['workspaces_invites']: 0 ,
+   );
+$form['activity_settings']['notify']['user_subscribe'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Users subscribing to me'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' => $check_uid_user['user_subscribe'] ? $check_uid_user['user_subscribe']: 0 ,
+   );
+$form['activity_settings']['notify']['user_activity_workspace'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('User activity in my groups'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' => $check_uid_user['user_activity_workspace'] ? $check_uid_user['user_activity_workspace']: 0 ,
+   );
+/*$form['activity_settings']['user_activity_group'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('User activity in my groups'),
+    '#attributes' => array('class' => array('checkbox_label'),), 
+    '#default_value' => $check_uid_user['user_activity_group'] ? $check_uid_user['user_activity_group']: 0 ,
+   );*/
+$form['activity_settings']['notify']['user_activity_subscription'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('User activity from my subscriptions'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' => $check_uid_user['user_activity_subscription'] ? $check_uid_user['user_activity_subscription']: 0 ,
+   );
+/*$form['activity_settings']['notify']['forward_invitations'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Forward invitations to e-mail'), 
+    '#attributes' => array('class' => array('checkbox_label'),), 
+    '#default_value' => $check_uid_user['forward_invitations'] ? $check_uid_user['forward_invitations']: 0 ,
+   );
+$form['activity_settings']['notify']['forward_subscription'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Forward subscription activity to e-mail'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' => $check_uid_user['forward_subscription'] ? $check_uid_user['forward_subscription']: 0 ,
+    '#suffix' => '</div>',    
+   ); */
+
+// For Bookmarked items
+
+  /*$form['bookmark_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Bookmarked content'),
+    '#collapsible' => TRUE,
+    '#collapsed' => false,
+    
+
+  );
+
+  $form['bookmark_settings']['content_changes_bookmark'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Content changes in bookmarked items'),
+    '#attributes' => array('class' => array('checkbox_label'),), 
+    '#default_value' => $check_uid_bookmark['content_changes_bookmark'] ? $check_uid_bookmark['content_changes_bookmark']: 0 ,
+   );
+   $form['bookmark_settings']['comment_bookmark'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Comments on bookmarked items'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' => $check_uid_bookmark['commentt_bookmark'] ? $check_uid_bookmark['commentt_bookmark']: 0 ,
+   );
+   $form['bookmark_settings']['likes_bookmark'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Likes on bookmarked items'),
+    '#attributes' => array('class' => array('checkbox_label'),), 
+    '#default_value' => $check_uid_bookmark['likes_bookmark'] ? $check_uid_bookmark['likes_bookmark']: 0 ,   
+   );
+ */
+ 
+
+
+
+
+$form['activity_settings']['email'] = array(
+    '#type' => 'fieldset',
+    '#title' => t("E-mail Notifications"),
+    '#description' => t(''),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE, 
+    '#prefix' => '<div class = "save_settings_form" >',   
+  );
+
+  $form['activity_settings']['email']['daily_summary'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Daily summary from T[h]inker.net'), 
+   '#attributes' => array('class' => array('checkbox_label'),),
+   '#default_value' =>  $check_uid_user['daily_summary'] ? $check_uid_user['daily_summary']: 0 ,
+   );
+  
+  $form['activity_settings']['email']['new_member_profile'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Creation of new member profile'),
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' =>  $check_uid_user['email_member_profile'] ? $check_uid_user['email_member_profile']: 0 ,     
+   );
+
+  $form['activity_settings']['email']['member_profile_update'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Updating of existing member profile'),
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' =>  $check_uid_user['email_update_mprofile'] ? $check_uid_user['email_update_mprofile']: 0 ,    
+   ); 
+
+
+$form['activity_settings']['email']['email_user_subscribe'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Users subscribing to me'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' =>  $check_uid_user['email_user_subscribe'] ? $check_uid_user['email_user_subscribe']: 0 ,
+   );
+$form['activity_settings']['email']['email_user_activity_group'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('User activity in my group'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' =>  $check_uid_user['email_user_activity_group'] ? $check_uid_user['email_user_activity_group']: 0 ,
+   );
+
+/*$form['activity_settings']['email']['email_user_subscribe_activity'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('User activity from my subscriptions'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' =>  $check_uid_user['email_user_subscribe_activity'] ? $check_uid_user['email_user_subscribe_activity']: 0 ,
+   );
+$form['activity_settings']['email']['forward_invitations'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Forward group invitations to e-mail'), 
+    '#attributes' => array('class' => array('checkbox_label'),), 
+    '#default_value' =>  $check_uid_user['forward_invitations'] ? $check_uid_user['forward_invitations']: 0 ,
+   );*/
+$form['activity_settings']['email']['forward_subscription'] = array(
+    '#type' => 'checkbox', 
+    '#title' => t('Forward subscription activity to e-mail'), 
+    '#attributes' => array('class' => array('checkbox_label'),),
+    '#default_value' =>  $check_uid_user['forward_subscription'] ? $check_uid_user['forward_subscription']: 0 , 
+    '#suffix' => '</div>',   
+   );
+
+
+   $form['activity_settings']['submit'] = array(
+    '#type' => 'submit',
+  '#attributes' => array('class' => array('save_settings_button'),), 
+    '#value' => t('Save settings'),
+    '#suffix'=>'</div>', 
+   
+  );
+
+
+
+  return $form;
+  
+}
+
+
+function save_settings_form_personal_submit($form, &$form_state) {
+  $userId = $GLOBALS['user']->uid;
+  $check_uid = db_select('save_user_settings', 's')
+   ->fields('s')
+   ->condition('s.uid', $userId, '=') 
+   ->execute()
+   ->fetchAssoc();
+   if(!$check_uid){
+     $nid = db_insert('save_user_settings')     
+     ->fields(array(
+          'uid' => $userId,
+          'new_newsitems' => $form_state['values']['new_newsitems'],
+          'new_events' => $form_state['values']['new_events'],
+          'new_groups' => $form_state['values']['new_groups'],
+          'workspaces_invites' => $form_state['values']['workspaces_invites'],
+          'user_subscribe' => $form_state['values']['user_subscribe'],
+          'user_activity_workspace' => $form_state['values']['user_activity_workspace'],
+           'user_activity_group' => $form_state['values']['user_activity_workspace'],
+           'user_activity_subscription' => $form_state['values']['user_activity_subscription'],
+           'forward_invitations' => $form_state['values']['forward_invitations'],
+           'forward_subscription' => $form_state['values']['forward_subscription'],
+           'daily_summary' => $form_state['values']['daily_summary'],
+           'email_member_profile' => $form_state['values']['new_member_profile'],
+           'email_update_mprofile' => $form_state['values']['member_profile_update'],
+           'email_user_subscribe' => $form_state['values']['email_user_subscribe'],
+           'email_user_activity_group' => $form_state['values']['email_user_activity_group'],
+           'email_user_subscribe_activity' => $form_state['values']['email_user_subscribe_activity'],
+          
+       ))
+    ->execute(); 
+//  $form_state['values']['user_activity_group']
+   /* $nid = db_insert('save_bookmark_settings ')     
+     ->fields(array(
+          'uid' => $userId,
+          'content_changes_bookmark' => $form_state['values']['content_changes_bookmark'],
+          'commentt_bookmark' => $form_state['values']['comment_bookmark'],
+          'likes_bookmark' => $form_state['values']['likes_bookmark'],
+                   
+       ))
+    ->execute(); */
+ drupal_set_message("User Settings saved");
+}
+else {
+drupal_set_message("User Settings Edited");
+$nid = db_update('save_user_settings')     
+     ->fields(array(
+          'new_newsitems' => $form_state['values']['new_newsitems'],
+          'new_events' => $form_state['values']['new_events'],
+          'new_groups' => $form_state['values']['new_groups'],
+          'workspaces_invites' => $form_state['values']['workspaces_invites'],
+          'user_subscribe' => $form_state['values']['user_subscribe'],
+          'user_activity_workspace' => $form_state['values']['user_activity_workspace'],
+           'user_activity_group' => $form_state['values']['user_activity_workspace'],
+           'user_activity_subscription' => $form_state['values']['user_activity_subscription'],
+          // 'forward_invitations' => $form_state['values']['forward_invitations'],
+           'forward_subscription' => $form_state['values']['forward_subscription'],
+           'daily_summary' => $form_state['values']['daily_summary'],
+           'email_member_profile' => $form_state['values']['new_member_profile'],
+           'email_update_mprofile' => $form_state['values']['member_profile_update'],
+           'email_user_subscribe' => $form_state['values']['email_user_subscribe'],
+           'email_user_activity_group' => $form_state['values']['email_user_activity_group'],
+          // 'email_user_subscribe_activity' => $form_state['values']['email_user_subscribe_activity'],
+          
+       ))
+    ->condition('save_user_settings.uid', $userId, '=')
+    ->execute(); 
+//  $form_state['values']['user_activity_group']
+    /*$nid = db_update('save_bookmark_settings ')     
+     ->fields(array(
+          'content_changes_bookmark' => $form_state['values']['content_changes_bookmark'],
+          'commentt_bookmark' => $form_state['values']['comment_bookmark'],
+          'likes_bookmark' => $form_state['values']['likes_bookmark'],
+                   
+       ))
+    ->execute(); */
+}
+  drupal_goto('<front>');
+}
+
+function save_settings_block_info() {
+  $blocks = array();
+  $blocks['save_settings_content_block'] = array(
+    'info' => t('Most Recent Activities by saved settings'), 
+    );
+	$blocks['save_settings_form_block'] = array(
+    'info' => t('Notifications by saved settings'), 
+    );
+
+	$blocks['save_settings_title_block'] = array(
+    'info' => t('Title Only Flash Feed'), 
+    );
+   return $blocks;
+}
+
+
+function save_settings_block_view($delta = '') {
+ 
+  $block = array();
+
+  switch ($delta) {
+    case 'save_settings_content_block':
+      //$block['subject'] = t('Most Recent Activity:');
+      $block['content'] = save_settings_block_content();
+      break;
+	 case 'save_settings_form_block':
+     //$block['subject'] = null; // Most forms don't have a subject 
+      $block['content'] = drupal_render(drupal_get_form('save_settings_form'));
+      break; 
+	  
+	 case 'save_settings_title_block':
+     $block['subject'] = t('What\'s happening?');
+      $block['content'] = save_settings_block_title();
+      break; 
+}
+  return $block;
+  
+}
+
+
+
+function save_settings_block_content(){
+drupal_get_path('module', 'save_settings') . '/save_settings.css';
+$userId = $GLOBALS['user']->uid;
+$contentSettings = db_select('save_user_settings', 'u')
+              ->fields('u')
+              ->condition('u.uid', $userId, '=')
+              ->execute()
+              ->fetchAssoc();  
+ 		
+/*$bookmarkSettings = db_select('save_bookmark_settings', 'b')
+              ->fields('b')
+              ->condition('b.uid', $userId, '=')
+              ->execute()
+              ->fetchAssoc();
+  		*/
+/*$contentSettings->union(bookmarkSettings, 'UNION ALL');
+$settings = $contentSettings->execute();*/
+//$settings = $contentSettings + $bookmarkSettings;
+$settings = $contentSettings;
+//return ('<pre>'. print_r($settings, TRUE) .'</pre>');
+
+$items = array();
+
+
+
+
+
+
+
+
+
+
+/*$result = db_select('node', 'n')
+   		->fields('n');*/
+
+
+$result = db_select('node', 'n');
+           $result->join('users', 'u', 'n.uid = u.uid');
+           $result 
+           	->fields('n')
+              ->fields('u', array('name'));
+   		
+  /* if($settings['new_newsitems'])$result->condition('n.type', 'newsitem', '=');
+   if($settings['new_events'])$result->condition('n.type', 'event', '=');
+   if($settings['new_groups'])$result->condition('n.type', 'test_private_group', '=');*/
+   $contentType = array();
+   // Joining the comments from the subscriptions .... 
+ $commentingUsers = array();
+if($settings['user_activity_subscription']){
+   $subscribedTo = db_select('flag_content', 's')
+                   ->fields('s')
+                   ->condition('s.uid', $GLOBALS['user']->uid, '=')
+		           ->condition('s.content_type', 'user', '=')	
+                   ->execute()
+                   ->fetchAll();
+
+foreach($subscribedTo as $subscription){
+array_push($commentingUsers, $subscription->content_id);
+
+}
+
+if(count($commentingUsers)>0){
+
+$comments = db_select('comment', 'c');
+           $comments->join('node', 'n', 'c.nid = n.nid');
+           $comments
+           	->fields('c')
+              ->fields('n', array('title'));
+	  //if(count($commentingUsers)>0)
+             $comments->condition('c.uid', $commentingUsers, 'IN');
+   	  //else $comment->condition('c.subject', 'noCommentShouldbeFound', '=');
+            	$comments = $comments->orderBy('c.created', 'DESC')
+            	->execute()
+            	->fetchAll();
+//->range(0,10)
+
+foreach($comments as $comment){
+
+//$items[] = l($comment->name, 'user/' . $comment->uid) . '&nbsp;<span>commented </b>'.$comment->subject.'</b> on <b>'. l($comment->title, 'node/'.$comment->nid) . t('</b> @time ago.', array('@time' => format_interval(REQUEST_TIME - $comment->created))).'</span>';
+
+
+$content = l($comment->name, 'user/' . $comment->uid) . '&nbsp;<span>commented <b>'.$comment->subject.'</b> on <b>'. l($comment->title, 'node/'.$comment->nid) . t('</b> @time ago.', array('@time' => format_interval(REQUEST_TIME - $comment->created))).'</span>';
+$timeStamp = $comment->created;
+
+$items[] = array('content' =>$content, 'timeStamp' =>$timeStamp);
+
+
+
+}
+}
+
+array_push($contentType, 'tools');
+array_push($contentType, 'case_study');
+array_push($contentType, 'instructional_materials');
+array_push($contentType, 'insights');
+//array_push($contentType, 'position_statements');
+}
+
+   if($settings['new_newsitems'])array_push($contentType, 'newsitem');
+   if($settings['new_events'])array_push($contentType, 'event');
+   if($settings['new_groups'])array_push($contentType, 'test_private_group');
+   
+
+
+     if(count($contentType)>0)$result->condition('n.type', $contentType, 'IN');
+     else $result->condition('n.type', 'noContentRequired', '=');
+
+   	$result =  $result->orderBy('created', 'DESC')->execute()->fetchAll();
+       //->range(0,10)
+	//return $result ? $result: array();
+	//return ('<pre>'. print_r($result, TRUE) .'</pre>'); 
+
+
+foreach($result as $node){
+//$items[] = l($node->title, 'node/' . $node->nid) . '&nbsp;<span>Created ' . t('@time ago', array('@time' => format_interval(REQUEST_TIME - $node->created))) . ' content-type is '. $node->type.'</span>';
+
+
+
+
+$content = l($node->name, 'user/' . $node->uid) . '&nbsp;<span>created new post </u> called '.l($node->title, 'node/' . $node->nid) . t(' @time ago.', array('@time' => format_interval(REQUEST_TIME - $node->created))) . '</span>';
+$timeStamp = $node->created;
+
+$items[] = array('content' =>$content, 'timeStamp' =>$timeStamp);
+
+
+}
+
+
+
+if ($items) {
+    $attributes = array(
+  'id' => 'notifcations-listing',
+  'class' => 'notification_listing_class', // a string or indexed (string) array with the classes for the list tag
+);
+   
+//return theme('item_list', array('items' => $items , 'title' => 'Most Recent Activity', 'type' => 'ul', 'attributes' => $attributes));
+
+usort($items, 'pushLatestFirst');
+if (count($items)>10)array_splice($items, 10);
+return theme('item_list', array('items' => insertIntoArray($items), 'title' => '', 'type' => 'ul', 'attributes' => $attributes));
+
+  }
+  else {
+    return t('No contents available.');
+  }
+
+}
+
+
+
+function save_settings_block_title(){
+drupal_get_path('module', 'save_settings') . '/save_settings.css';
+$userId = $GLOBALS['user']->uid;
+$contentSettings = db_select('save_user_settings', 'u')
+              ->fields('u')
+              ->condition('u.uid', $userId, '=')
+              ->execute()
+              ->fetchAssoc();  
+ 	
+
+$settings = $contentSettings;
+$items = array();
+
+$result = db_select('node', 'n');
+           $result->join('users', 'u', 'n.uid = u.uid');
+           $result 
+           	->fields('n')
+              ->fields('u', array('name'));
+   		
+     $contentType = array();
+   // Joining the comments from the subscriptions .... 
+ $commentingUsers = array();
+if($settings['user_activity_subscription']){
+   $subscribedTo = db_select('flag_content', 's')
+                   ->fields('s')
+                   ->condition('s.uid', $GLOBALS['user']->uid, '=')
+		           ->condition('s.content_type', 'user', '=')	
+                   ->execute()
+                   ->fetchAll();
+
+foreach($subscribedTo as $subscription){
+array_push($commentingUsers, $subscription->content_id);
+
+}
+
+if(count($commentingUsers)>0){
+
+$comments = db_select('comment', 'c');
+           $comments->join('node', 'n', 'c.nid = n.nid');
+           $comments
+           	->fields('c')
+              ->fields('n', array('title'));
+	             $comments->condition('c.uid', $commentingUsers, 'IN');
+   	           	$comments = $comments->orderBy('c.created', 'DESC')
+            	->execute()
+            	->fetchAll();
+				
+foreach($comments as $comment){
+$title = $comment->title;
+if (strlen($title)>20)$title = substr($title, 0, 19)."... ";
+$content = l($comment->name, 'user/' . $comment->uid) . '&nbsp;<span>commented on '. l($title, 'node/'.$comment->nid) .'</span>';
+$timeStamp = $comment->created;
+$items[] = array('content' =>$content, 'timeStamp' =>$timeStamp);
+}
+}
+
+array_push($contentType, 'tools');
+array_push($contentType, 'case_study');
+array_push($contentType, 'instructional_materials');
+array_push($contentType, 'insights');
+}
+
+   if($settings['new_newsitems'])array_push($contentType, 'newsitem');
+   if($settings['new_events'])array_push($contentType, 'event');
+   if($settings['new_groups'])array_push($contentType, 'test_private_group');
+   
+
+
+     if(count($contentType)>0)$result->condition('n.type', $contentType, 'IN');
+     else $result->condition('n.type', 'noContentRequired', '=');
+
+   	$result =  $result->orderBy('created', 'DESC')->execute()->fetchAll();
+    
+foreach($result as $node){
+$title = $node->title;
+if (strlen($title)>20)$title = substr($title, 0, 19)."... ";
+$node_type = $node->type;
+if ($node_type == "newsitem")$node_type = "news";
+elseif ($node_type == "tools")$node_type = "method";
+elseif ($node_type == "case_study ")$node_type = "case study";
+elseif ($node_type == "instructional_materials  ")$node_type = "instructional material";
+elseif ($node_type == "insights")$node_type = "insight";
+elseif ($node_type == "test_private_group")$node_type = "workspace";
+elseif  ($node_type == "artilce")$node_type = "working document";
+
+$content = l($node->name, 'user/' . $node->uid) . '&nbsp;<span>created '.$node_type. ' called '.l($title, 'node/' . $node->nid).'</span>';
+$timeStamp = $node->created;
+$items[] = array('content' =>$content, 'timeStamp' =>$timeStamp);
+}
+
+
+
+if ($items) {
+    $attributes = array(
+  'id' => 'notifcations-title-listing',
+  'class' => 'notification_title_listing_class', // a string or indexed (string) array with the classes for the list tag
+);
+
+
+usort($items, 'pushLatestFirst');
+if (count($items)>10)array_splice($items, 10);
+return theme('item_list', array('items' => insertIntoArray($items), 'title' => '', 'type' => 'ul', 'attributes' => $attributes));
+
+  }
+  else {
+    return t('No contents available.');
+  }
+
+}
+
+
+
+function insertIntoArray($Array){
+
+$array = array();
+
+foreach ($Array as $arrayComponent){
+$array[] = $arrayComponent['content'];
+
+}
+/*usort($array, 'cmp');
+if (count($array)>10)array_splice($array, 10);*/
+return $array;
+
+}
+
+
+function pushLatestFirst($a, $b)
+{
+    return $b['timeStamp'] - $a['timeStamp'];
+}
+
+/*
+function save_settings_overlay_child_initialize() {
+  // Add our custom JavaScript.
+  drupal_add_js(drupal_get_path('module', 'save_settings') . '/overlay-child.js');
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+?>

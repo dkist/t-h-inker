@@ -1,0 +1,124 @@
+<?php
+
+function convert_content_type_menu() {  
+  $items['convert_content_type'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('convert_content_type_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  
+ // 'title' => 'Export As',
+
+  
+  return $items;
+}
+
+function convert_content_type_form($form, &$form_state) {
+  
+    $form_state['storage'] = array(
+      'step' => 'convert_content_type_form_personal',
+    );
+  $function = $form_state['storage']['step'];
+  $form = $function($form, $form_state);
+  return $form;
+}
+
+/**
+ * Primary validate handler.
+ */
+function convert_content_type_form_validate($form, &$form_state) {
+  // Call step validate handler if it exists.
+  if (function_exists($form_state['storage']['step'] . '_validate')) {
+    $function = $form_state['storage']['step'] . '_validate';
+    $function($form, $form_state);
+  }
+  return; 
+}
+
+/**
+ * Primary submit handler.
+ */
+function convert_content_type_form_submit($form, &$form_state) {
+  $values = $form_state['values'];
+  
+    // Record step.
+    $step = $form_state['storage']['step'];
+    $form_state['storage']['steps'][] = $step;
+    // Call step submit handler if it exists.
+    if (function_exists($step . '_submit')) {
+      $function = $step . '_submit';
+      $function($form, $form_state);
+    }
+  
+  return;
+}
+
+function convert_content_type_form_personal($form, &$form_state) {
+ 
+ $form['convert_into'] = array(
+  '#type' => 'select',
+  '#title' => t('Export As'),
+  '#default_value' => variable_get('convert_into', array('status')),
+  '#options' => array(
+    'tools' => t('Method'),
+    'case_study' => t('Case Study'),
+    'instructional_materials' => t('Instructional Material'),
+    //'position_statements' => t('Position Statement'),
+    'insights' => t('Insights'),
+  ),
+  '#description' => t('Select the type to convert to'),
+);
+  
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Export'),
+  );
+  return $form;
+  
+}
+
+function convert_content_type_form_personal_submit($form, &$form_state) {
+  $convertType = $form_state['values']['convert_into'];
+  $source_fields = array(    
+    
+    );
+  
+  $dest_fields = array (      
+       
+  );
+$nodeId = arg(1); $plid = 993;
+node_convert_node_convert($nodeId, $convertType, $source_fields, $dest_fields, FALSE);
+//if ($convertType == 'tools')drupal_goto('tools');
+if ($convertType == 'case_study')$plid = 994;
+elseif ($convertType == 'instructional_materials')$plid = 996;
+//elseif ($convertType == 'position_statements')$plid = 997;
+elseif ($convertType == 'insights')$plid = 995;
+  
+  
+$p4 = db_select('menu_links', 'm')->fields('m')->condition('link_path', 'node/'.$nodeId, '=')->execute()->fetchAssoc();
+db_update('menu_links') 
+  ->fields(array(
+    'plid' => $plid,
+    'depth' => 3,
+    'p1' => 901, 'p2'=>$plid, 'p3'=>$p4['p4'], 'p4'=>0,   
+  ))
+  ->condition('link_path', 'node/'.$nodeId, '=')
+  ->execute();
+  
+if ($convertType == 'tools')drupal_goto('tools');
+elseif ($convertType == 'case_study')drupal_goto('caseStudy');
+elseif ($convertType == 'instructional_materials')drupal_goto('instructional-materials');
+//elseif ($convertType == 'position_statements')drupal_goto('position-statement');
+elseif ($convertType == 'insights')drupal_goto('insights'); 
+  
+}
+
+
+function convert_content_type_overlay_child_initialize() {
+  // Add our custom JavaScript.
+  drupal_add_js(drupal_get_path('module', 'convert_content_type') . '/overlay_export_as.js');
+}
+
+
+?>

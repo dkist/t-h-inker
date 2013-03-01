@@ -1,0 +1,191 @@
+<?php
+
+ function save_settings_schema() {
+         $schema['save_user_settings'] = array(
+         'description' => t('The base table for saved settings.'),
+         'fields' => array(
+         'uid' => array(
+         'description' => t('The primary identifier'),
+         'type' => 'int',
+         'unsigned' => TRUE,
+         'not null' => TRUE,
+        ),
+
+        'new_newsitems' => array(
+        'description' => t('Creation of new newsitems.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,  
+        ),
+           
+        'new_events' => array(
+        'description' => t('Creation of new events.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,  
+        ), 
+           
+        'new_groups' => array(
+        'description' => t('Creation of new groups.'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,  
+        ),   
+        
+        'workspaces_invites' => array(
+        'description' => t('Workspace invitations'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+         'default' => 0, 
+        ),     
+           
+         'user_subscribe' => array(
+        'description' => t('User subscribing to me'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),     
+          
+        'user_activity_workspace' => array(
+        'description' => t('User activity in my workspace'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,  
+        ),    
+         
+        'user_activity_group' => array(
+        'description' => t('User activity in my groups'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,  
+        ),    
+              
+           
+       'user_activity_subscription' => array(
+        'description' => t('User activity from my subscriptions'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0, 
+        ),   
+          
+        
+        'forward_invitations' => array(
+        'description' => t('Forward invitations to e-mail'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),     
+           
+        'forward_subscription' => array(
+        'description' => t('Forward subscription activity to e-mail'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),
+
+        'daily_summary' => array(
+        'description' => t('Digest Email'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),
+
+        'email_member_profile' => array(
+        'description' => t('New member profile'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),
+
+        'email_update_mprofile' => array(
+        'description' => t('Updating of the member profile'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),
+
+        'email_user_subscribe' => array(
+        'description' => t('User subscribing to user'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),
+
+        'email_user_activity_group' => array(
+        'description' => t('User activity in group'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),
+
+        'email_user_subscribe_activity' => array(
+        'description' => t('User activity from subscription'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),
+     ),
+      'primary key' => array('uid'),  
+      
+    );
+       
+$schema['save_bookmark_settings'] = array(
+      
+      'description' => t('The base table for bookmarked  articles.'),
+         'fields' => array(
+         'uid' => array(
+         'description' => t('The primary identifier'),
+         'type' => 'int',
+         'unsigned' => TRUE,
+         'not null' => TRUE,
+        ), 
+ 
+       'content_changes_bookmark' => array(
+        'description' => t('Content changes in bookmarked items'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,   
+        ),     
+           
+        'commentt_bookmark' => array(
+        'description' => t('Comments on bookmarked items'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,  
+        ),    
+        
+       'likes_bookmark' => array(
+        'description' => t('Likes on bookmarked items'),
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0, 
+        ),     
+           
+        ),
+        'primary key' => array('uid'),
+      );
+
+return $schema;
+
+}
+
+?>
